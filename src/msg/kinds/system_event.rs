@@ -4,7 +4,8 @@ use crate::types::EventCode;
 /// Signals a market or data feed handler event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SystemEvent {
-    event_code: EventCode 
+    // TODO: TBD: SystemEvent & EventCode can be collapsed into one type?
+    pub event_code: EventCode 
 }
 
 impl SystemEvent {
