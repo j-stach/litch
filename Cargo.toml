@@ -12,6 +12,7 @@ categories = ["network-programming", "finance"]
 
 [dependencies]
 chrono = { version = "0.4.41", default-features = false, features = ["std"] }
+nom = "8.0.0"
 thiserror = "2.0.12"
 
 
