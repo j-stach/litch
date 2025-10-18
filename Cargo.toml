@@ -1,0 +1,17 @@
+
+[package]
+name = "litch"
+authors = ["j-stach"]
+version = "0.0.0"
+edition = "2024"
+readme = "README.md"
+repository = "https://github.com/j-stach/litch"
+description = "Simple parser for ITCH 5.0, oriented toward live messages."
+keywords = ["itch", "nasdaq", "trading", "finance"]
+categories = ["network-programming", "finance"]
+
+[dependencies]
+chrono = { version = "0.4.41", default-features = false, features = ["std"] }
+thiserror = "2.0.12"
+
+
