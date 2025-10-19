@@ -41,47 +41,71 @@ macro_rules! msg_kinds {
 
                 Ok((input, message))
             }
+
+            // TODO get metadata values with convenience
         }
 
     }
 }
 
 msg_kinds!{
+
     // 1.1
-    [b'S'] SystemEvent "Market or data feed handler event.",
+    [b'S'] SystemEvent 
+        "Market or data feed handler event.",
+
     // 1.2
-    // [b'R'] StockDirectory              
-    // [b'H'] TradingAction               
+    [b'R'] StockDirectory
+        "",
+    [b'H'] TradingAction 
+        "",            
     [b'Y'] RegShoRestriction 
-        "Regulation SHO Short Sale Price Test Restricted Indicator.",       
-    // [b'L'] MarketParticipantPosition   
-    // [b'V'] MwcbDeclineLevel            
-    // [b'W'] MwcbStatus                  
-    // [b'K'] QuotingPeriodUpdate         
-    // [b'J'] LuldActionCollar            
-    // [b'h'] OperationalHalt             
+        "Regulation SHO Short-Sale-Price-Test-Restricted Indicator.",       
+    [b'L'] MarketParticipantPosition
+        "",
+    [b'V'] MwcbDeclineLevel
+        "",
+    [b'W'] MwcbStatus                  
+        "",
+    [b'K'] QuotingPeriodUpdate         
+        "",
+    [b'J'] LuldAuctionCollar            
+        "",
+    [b'h'] OperationalHalt             
+        "",
+
     // 1.3
-    // [b'A'] AddOrder                    
-    // [b'F'] AddOrderWithMpid            
+    [b'A'] AddOrder                    
+        "",
+    [b'F'] AddOrderWithAttr            
+        "",
+
     // 1.4
-    // [b'E'] OrderExecuted            
-    // [b'C'] OrderExecutedWithPrice      
-    // [b'X'] OrderCanceled
-    // [b'D'] OrderDeleted
-    // [b'U'] OrderReplaced
+    [b'E'] OrderExecuted            
+        "",
+    [b'C'] OrderExecutedWithPrice      
+        "",
+    [b'X'] OrderCancel
+        "",
+    [b'D'] OrderDelete
+        "",
+    [b'U'] OrderReplace
+        "",
+    
     // 1.5
     // [b'P'] MatchTrade
     // [b'Q'] CrossTrade
     // [b'B'] BrokenTrade
+    
     // 1.6
     // [b'I'] NetOrderImbalance
+    
     // 1.7
     // [b'N'] RetailPriceImprovement
+    
     // 1.8
     // [b'O'] DirectListingWithCapitalRaise
 
 }
 
-
-    // TODO get metadata values with convenience
 
