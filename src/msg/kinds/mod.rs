@@ -1,77 +1,28 @@
 
-// TODO Reorganize mods based on specsubsection
-
-mod system_event;
-
-mod stock_directory;
-mod trading_action;
-mod reg_sho_restriction;
-mod market_participant_position;
-mod mwcb_decline_level;
-mod mwcb_status;
-mod quoting_period_update;
-mod luld_auction_collar;
-mod operational_halt;
-
-mod add_order;
-
-mod order_executed;
-mod order_cancel;
-mod order_replace;
-
-mod trade_messages;
-mod net_order_imbalance;
-mod retail_price_improvement;
-mod direct_listing_with_capital_raise;
+mod system_event; // 1.1
+mod stock_related; // 1.2
+mod add; // 1.3
+mod modify; // 1.4
+mod trade_related; // 1.5
+mod net_order_imbalance; // 1.6
+mod retail_price_improvement; // 1.7
+mod direct_listing_with_capital_raise; // 1.8
 
 pub use self::{
 
     system_event::{ SystemEvent, EventCode },
 
-    stock_directory::{ 
-        StockDirectory, 
-        MarketCategory,
-        FinancialStatus,
-        Authenticity,
-        ShortSaleThreshold,
-        IpoFlag,
-        LuldTier,
-        EtpFlag,
-    },
-    trading_action::{ TradingAction, TradingState },
-    reg_sho_restriction::{ RegShoRestriction, RegShoAction },
-    market_participant_position::{ 
-        MarketParticipantPosition, 
-        MarketMakerMode,
-        MarketParticipantState,
-    },
-    mwcb_decline_level::MwcbDeclineLevel,
-    mwcb_status::{ MwcbStatus, BreachedLevel },
-    quoting_period_update::{ 
-        QuotingPeriodUpdate, 
-        IpoQuotationReleaseQualifier 
-    },
-    luld_auction_collar::LuldAuctionCollar,
-    operational_halt::{ 
-        OperationalHalt, 
-        HaltAction, 
-        MarketCode 
-    },
+    stock_related::*,
 
-    add_order::{
+    add::{
         AddOrder,
         AddOrderWithAttr,
         Side
     },
-    
-    order_executed::{
-        OrderExecuted,
-        OrderExecutedWithPrice,
-    },
-    order_cancel::{ OrderCancel, OrderDelete },
-    order_replace::OrderReplace,
 
-    trade_messages::{
+    modify::*,
+    
+    trade_related::{
         MatchTrade,
         CrossTrade,
         BrokenTrade,
