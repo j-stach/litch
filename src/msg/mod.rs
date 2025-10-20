@@ -23,11 +23,12 @@ macro_rules! msg_kinds {
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum ItchMessage {$(
             #[doc = $doc]
-            $kind { metadata: ItchMetadata, body: $kind },
+            $kind { metadata: ItchMetadata, body: crate::msg::kinds::$kind },
         )*}
 
         impl ItchMessage {
-            // TODO ItchError::Parse and UnexpectedTag, etc.
+
+            /// Parse a byte array into an ItchMessage.
             pub fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
                 let (input, tag) = nom::number::streaming::be_u8(input)?;
@@ -42,7 +43,12 @@ macro_rules! msg_kinds {
                 Ok((input, message))
             }
 
-            // TODO get metadata values with convenience
+            /// Extract the metadata common to all message types.
+            pub fn metadata(&self) -> ItchMetadata {
+                match self {$(
+                    Self::$kind { metadata, body: _ } => *metadata,
+                )*}
+            }
         }
 
     }
@@ -93,19 +99,24 @@ msg_kinds!{
         "",
     
     // 1.5
-    // [b'P'] MatchTrade
-    // [b'Q'] CrossTrade
-    // [b'B'] BrokenTrade
+    [b'P'] MatchTrade
+        "",
+    [b'Q'] CrossTrade
+        "",
+    [b'B'] BrokenTrade
+        "",
     
     // 1.6
-    // [b'I'] NetOrderImbalance
+    [b'I'] NetOrderImbalance
+        "",
     
     // 1.7
-    // [b'N'] RetailPriceImprovement
+    [b'N'] RetailPriceImprovement
+        "",
     
     // 1.8
-    // [b'O'] DirectListingWithCapitalRaise
-
+    [b'O'] DirectListingWithCapitalRaise
+        "",
 }
 
 
