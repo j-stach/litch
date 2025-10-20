@@ -19,6 +19,11 @@ mod order_executed;
 mod order_cancel;
 mod order_replace;
 
+mod trade_messages;
+mod net_order_imbalance;
+mod retail_price_improvement;
+mod direct_listing_with_capital_raise;
+
 pub use self::{
 
     system_event::{ SystemEvent, EventCode },
@@ -66,5 +71,25 @@ pub use self::{
     order_cancel::{ OrderCancel, OrderDelete },
     order_replace::OrderReplace,
 
+    trade_messages::{
+        MatchTrade,
+        CrossTrade,
+        BrokenTrade,
+        CrossType,
+    },
+
+    net_order_imbalance::{
+        NetOrderImbalance,
+        ImbalanceDirection,
+        ImbalanceCrossType,
+        PriceVariation,
+    },
+
+    retail_price_improvement::{
+        RetailPriceImprovement,
+        InterestFlag,
+    },
+
+    direct_listing_with_capital_raise::DirectListingWithCapitalRaise,
 };
 
