@@ -87,6 +87,19 @@ impl CrossTrade {
 
 }
 
+crate::types::define_enum!{
+
+    CrossType:
+        "NASDAQ cross session for which the message is being generated.";
+
+    ['O'] Opening
+        "NASDAQ opening cross",
+    ['C'] Closing
+        "NASDAQ closing cross",
+    ['H'] Halt
+        "Cross for IPO and halted / paused securities.",
+}
+
 
 /// Sent whenever an execution on Nasdaq is broken. 
 /// An execution may be broken if it is found to be “clearly erroneous” 
@@ -112,18 +125,5 @@ impl BrokenTrade {
 
 }
 
-
-crate::types::define_enum!{
-
-    CrossType:
-        "NASDAQ cross session for which the message is being generated.";
-
-    ['O'] Opening
-        "NASDAQ opening cross",
-    ['C'] Closing
-        "NASDAQ closing cross",
-    ['H'] Halt
-        "Cross for IPO and halted / paused securities.",
-}
 
 
