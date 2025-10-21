@@ -4,13 +4,9 @@
 - [ ] Test documentation approach with `cargo doc`
 
 ### messages
-- [x] Macro for enum types
-- [x] Integer types added to parse sequences
-- [ ] Finish adding specialized fields & parse (see `nsdq`)
+- [ ] Finish adding specialized fields & parse (see `nsdq-util`)
 - [ ] Opinionated grammar for type renaming, make note of original
-- [x] Consolidate files to match sections in spec, as documentated
 `order.rs`
-- [x] order cancel/delete
 - [ ] order executed
 - [ ] order replace
 - [ ] Consolidate add types using `Option<Mpid>`? `OrderAdded`?
