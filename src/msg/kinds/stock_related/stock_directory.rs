@@ -1,11 +1,13 @@
 
+use nom::number::streaming::be_u32;
+
 ///
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct StockDirectory {
     //TODO stock: StockSymbol,
     pub market_category: MarketCategory,
     pub financial_status: FinancialStatus,
-    // TODO pub round_lot_size: u32,
+    pub round_lot_size: u32,
     // TODO pub round_lots_only: bool,
     // TODO pub classification: IssueClassification,
     // TODO pub subtype: IssueSubType,
@@ -25,6 +27,7 @@ impl StockDirectory {
 
         let (input, market_category) = MarketCategory::parse(input)?;
         let (input, financial_status) = FinancialStatus::parse(input)?;
+        let (input, round_lot_size) = be_u32(input)?;
         let (input, authenticity) = Authenticity::parse(input)?;
         let (input, short_sale_threshold) = ShortSaleThreshold::parse(input)?;
         let (input, ipo_flag) = IpoFlag::parse(input)?;
@@ -36,6 +39,7 @@ impl StockDirectory {
         Ok((input, Self { 
             market_category,
             financial_status,
+            round_lot_size,
             authenticity,
             short_sale_threshold,
             ipo_flag,

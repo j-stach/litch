@@ -18,13 +18,12 @@ impl OperationalHalt {
 
         Ok((input, Self { /*stock,*/ market, action }))
     }
-
 }
 
 crate::types::define_enum!{
 
     MarketCode:
-        "";
+        "Market being halted:";
 
     ['Q'] Nasdaq
         "NASDAQ",
@@ -37,7 +36,7 @@ crate::types::define_enum!{
 crate::types::define_enum!{
 
     HaltAction:
-        "";
+        "Market halt status:";
 
     ['H'] Halted
         "Operationally Halted on the identified Market.",

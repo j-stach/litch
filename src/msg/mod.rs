@@ -51,6 +51,10 @@ macro_rules! msg_kinds {
             }
         }
 
+        // TODO make `body` more easily accessible somehow
+        // implement Deref and DerefMut for ItchMessage?
+        // Use dyn Message trait?
+        // Use Option methods for fields?
     }
 }
 
