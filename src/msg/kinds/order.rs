@@ -2,6 +2,7 @@
 // TODO: May be able to combine these types
 
 use nom::number::streaming::{ be_u64, be_u32 };
+use nsdq_util::define_enum;
 
 /// Generated for unattributed orders accepted by NASDAQ. 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,7 +73,7 @@ impl AddOrderWithAttr {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     Side:
         "Buy/Sell Indicator";

@@ -1,5 +1,6 @@
 
 use nom::number::streaming::be_u32;
+use nsdq_util::define_enum;
 
 ///
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,7 +51,7 @@ impl StockDirectory {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     MarketCategory:
         "Listing market or listing market tier for the issue.";
@@ -75,7 +76,7 @@ crate::types::define_enum!{
         "Not available.",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     FinancialStatus:
         "Status of firm compliance with Nasdaq continued listing requirements.";
@@ -104,7 +105,7 @@ crate::types::define_enum!{
         "Not available. Firms should refer to SIAC feeds for code if needed.",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     Authenticity:
         "Denotes if an issue or quoting participant record is set-up in
@@ -118,7 +119,7 @@ crate::types::define_enum!{
         "Test only",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     ShortSaleThreshold:
         "Indicates if a security is subject to mandatory close-out of
@@ -132,7 +133,7 @@ crate::types::define_enum!{
         "Not available.",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     IpoFlag:
         "Indicates if the security is set up for IPO release. 
@@ -147,7 +148,7 @@ crate::types::define_enum!{
         "Not available.",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     LuldTier:
         "Indicates which Limit Up / Limit Down price band calculation
@@ -162,7 +163,7 @@ crate::types::define_enum!{
         "Not available.",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     EtpFlag:
         "Indicates whether the security is an exchange traded product (ETP).";
@@ -198,7 +199,7 @@ impl TradingAction {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     TradingState:
         "Current trading state of the stock.";
@@ -238,7 +239,7 @@ impl RegShoRestriction {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
     RegShoAction: 
         "Regulation SHO Short Sale Price Test Restriction status.";
 
@@ -277,7 +278,7 @@ impl MarketParticipantPosition {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     MarketMakerMode:
         "Quoting participant’s registration status in relation to SEC Rules 101 
@@ -295,7 +296,7 @@ crate::types::define_enum!{
         "",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     MarketParticipantState:
         "Market participant’s current registration status in the issue.";
@@ -350,7 +351,7 @@ impl MwcbStatus {
     }
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     BreachedLevel:
         "Denotes the MWCB Level that was breached.";
@@ -384,7 +385,7 @@ impl QuotingPeriodUpdate {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     IpoQuotationReleaseQualifier:
         "";
@@ -448,7 +449,7 @@ impl OperationalHalt {
     }
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     MarketCode:
         "Market being halted:";
@@ -461,7 +462,7 @@ crate::types::define_enum!{
         "PSX"
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     HaltAction:
         "Market halt status:";

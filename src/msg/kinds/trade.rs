@@ -8,6 +8,7 @@
 //! by firms just looking to track the NASDAQ execution system display.
 
 use nom::number::streaming::{ be_u64, be_u32 };
+use nsdq_util::define_enum;
 
 /// Provides execution details for normal matches of non-displayable orders. 
 /// (Since no `AddOrder` is generated when a non-displayed order is received, 
@@ -87,7 +88,7 @@ impl CrossTrade {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     CrossType:
         "NASDAQ cross session for which the message is being generated.";

@@ -1,6 +1,5 @@
 
-use chrono::NaiveTime;
-
+use nsdq_util::NaiveTime;
 
 /// Data common to all ITCH message types.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -16,20 +15,20 @@ pub struct ItchMetadata {
     pub timestamp: NaiveTime,
 }
 
-use nom::number::streaming::{ be_u16, be_u64 };
-use crate::helper::nanosec_from_midnight;
+use nom::number::streaming::be_u16;
+use nsdq_util::parse_nanosecs_bold;
 
 impl ItchMetadata {
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
         let (input, stock_locate) = be_u16(input)?;
         let (input, tracking_number) = be_u16(input)?;
-        let (input, timestamp) = be_u64(input)?;
+        let (input, timestamp) = parse_nanosecs_bold(input)?;
 
         Ok((input, Self { 
             stock_locate, 
             tracking_number, 
-            timestamp: nanosec_from_midnight(timestamp)
+            timestamp,
         }))
     }
 }

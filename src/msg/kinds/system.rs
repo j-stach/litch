@@ -1,4 +1,5 @@
 
+use nsdq_util::define_enum;
 
 /// Signals a market or data feed handler event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -17,7 +18,7 @@ impl SystemEvent {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     EventCode:
         "System events that can occur on the TotalView-ITCH data feed.";
@@ -84,7 +85,7 @@ impl NetOrderImbalance {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     ImbalanceDirection:
         "";
@@ -101,7 +102,7 @@ crate::types::define_enum!{
         "",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     ImbalanceCrossType:
         "";
@@ -116,7 +117,7 @@ crate::types::define_enum!{
         "",
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     PriceVariation:
         "Absolute value of the percentage of deviation of the 
@@ -171,7 +172,7 @@ impl RetailPriceImprovement {
 
 }
 
-crate::types::define_enum!{
+define_enum!{
 
     InterestFlag:
         "Availability of Retail Price Improvement orders.";
