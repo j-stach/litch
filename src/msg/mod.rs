@@ -85,9 +85,9 @@ msg_kinds!{
         "",
 
     // 1.3
-    [b'A'] AddOrder                    
+    [b'A'] OrderAdded                    
         "",
-    [b'F'] AddOrderWithAttr            
+    [b'F'] OrderAddedWithMpid            
         "",
 
     // 1.4
@@ -95,11 +95,11 @@ msg_kinds!{
         "",
     [b'C'] OrderExecutedWithPrice      
         "",
-    [b'X'] OrderCancel
+    [b'X'] OrderCanceled
         "",
-    [b'D'] OrderDelete
+    [b'D'] OrderDeleted
         "",
-    [b'U'] OrderReplace
+    [b'U'] OrderReplaced
         "",
     
     // 1.5

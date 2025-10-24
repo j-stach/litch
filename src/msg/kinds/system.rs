@@ -1,10 +1,18 @@
 
-use nsdq_util::define_enum;
+use nom::number::streaming::be_u64;
+use nsdq_util::{ 
+    define_enum, 
+    StockSymbol, 
+    Price,
+    NaiveTime,
+    parse_nanosecs_bold,
+    parse_bool,
+};
 
 /// Signals a market or data feed handler event.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SystemEvent {
-    // TODO: Can be collapsed into one type?
+    // TBD: Can be collapsed into one type?
     pub event_code: EventCode 
 }
 
@@ -52,17 +60,40 @@ define_enum!{
 }
 
 
-/// 
+/// Nasdaq begins disseminating Net Order Imbalance Indicators (NOII) 
+/// at 9:25 a.m. for the Opening Cross and 3:50 p.m. for the Closing Cross.
+///
+/// Between 9:25 and 9:28 a.m. and 3:50 and 3:55 p.m., 
+/// Nasdaq disseminates the NOII information every 10 seconds.
+///
+/// Between 9:28 and 9:30 a.m. and 3:55 and 4:00 p.m., Nasdaq disseminates the 
+/// NOII information every second.
+///
+/// For Nasdaq Halt, IPO and Pauses, NOII messages will be disseminated at 
+/// 1 second intervals starting 1 second after quoting period starts and 
+/// trading action is released.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NetOrderImbalance {
-    // paired_shares u64
-    // imbalance_shares u6
+
+    /// Number of shares that can be matched at the Current Reference Price.
+    pub paired_shares: u64,
+    /// The number of shares not paired at the Current Reference Price.
+    pub imbalance_shares: u64,
+    /// The market side of the order imbalance.
     pub imbalance_direction: ImbalanceDirection,
-    // stock
-    // far_price: Price32,
-    // near_price: Price32,
-    // ref_price: Price32,
+    /// Symbol for the security being listed.
+    pub stock: StockSymbol,
+    /// Hypothetical auction-clearing price (for cross orders only).
+    pub far_price: Price<u32, 4>,
+    /// Hypothetical auction-clearing price 
+    /// (for cross orders as well as continuous orders).
+    pub near_price: Price<u32, 4>,
+    /// Price at which the NOII shares are being calculated.
+    pub ref_price: Price<u32, 4>,
+    /// The type of cross for which the NOII message is being generated.
     pub cross_type: ImbalanceCrossType,
+    /// Absolute value of the percentage of deviation of the 
+    /// Near Indicative Clearing Price to the nearest Current Reference Price.
     pub price_variation: PriceVariation,
 }
 
@@ -70,14 +101,24 @@ impl NetOrderImbalance {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
-        // TODO
+        let (input, paired_shares) = be_u64(input)?;
+        let (input, imbalance_shares) = be_u64(input)?;
         let (input, imbalance_direction) = ImbalanceDirection::parse(input)?;
+        let (input, stock) = StockSymbol::parse(input)?;
+        let (input, far_price) = Price::<u32, 4>::parse(input)?;
+        let (input, near_price) = Price::<u32, 4>::parse(input)?;
+        let (input, ref_price) = Price::<u32, 4>::parse(input)?;
         let (input, cross_type) = ImbalanceCrossType::parse(input)?;
         let (input, price_variation) = PriceVariation::parse(input)?;
 
-        Ok((input, Self { 
+        Ok((input, Self {
+            paired_shares,
+            imbalance_shares,
             imbalance_direction, 
-            /*stock,*/ 
+            stock,
+            far_price,
+            near_price,
+            ref_price,
             cross_type,
             price_variation,
         }))
@@ -88,7 +129,7 @@ impl NetOrderImbalance {
 define_enum!{
 
     ImbalanceDirection:
-        "";
+        "The market side of the order imbalance.";
 
     ['B'] Buy
         "",
@@ -102,6 +143,7 @@ define_enum!{
         "",
 }
 
+// TODO: Consolidate cross types?
 define_enum!{
 
     ImbalanceCrossType:
@@ -153,10 +195,14 @@ define_enum!{
         "Cannot be calculated",
 }
 
-/// 
+/// Identifies a retail interest indication of the Bid, Ask, 
+/// or both the Bid and Ask for NASDAQ-listed securities.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct RetailPriceImprovement {
-    // stock
+
+    /// Symbol for the RPI security.
+    pub stock: StockSymbol,
+    /// Availability of Retail Price Improvement orders.
     pub interest_flag: InterestFlag
 }
 
@@ -164,10 +210,10 @@ impl RetailPriceImprovement {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
-        // TODO
+        let (input, stock) = StockSymbol::parse(input)?;
         let (input, interest_flag) = InterestFlag::parse(input)?;
 
-        Ok((input, Self { interest_flag }))
+        Ok((input, Self { stock, interest_flag }))
     }
 
 }
@@ -188,26 +234,56 @@ define_enum!{
 }
 
 
-/// 
+/// Sent only for Direct Listing with Capital Raise (DLCR) securities. 
+/// Nasdaq begins disseminating messages once per second as soon as the 
+/// DLCR volatility test has successfully passed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct DirectListingWithCapitalRaise {
-    // stock
-    // pub open_eligibility_status: bool,
-    // min allowable price: Price32
-    // max allowable price: Price32
-    // near execution price: Price32
-    // near execution time: u64
-    // lower price range collar: Price32
-    // upper price range collar: Price32
+
+    /// Symbol for the security listed.
+    pub stock: StockSymbol,
+    /// Indicates if the security is eligible to be released for trading.
+    pub eligibility: bool,
+    /// 20% below Registration Statement Lower Price.
+    pub min_price: Price<u32, 4>,
+    /// 80% above Registration Statement Highest Price.
+    pub max_price: Price<u32, 4>,
+    /// The current reference price when the DLCR volatility test has 
+    /// successfully passed.
+    pub near_exec_price: Price<u32, 4>,
+    /// The time at which the near execution price was set.
+    pub near_exec_time: NaiveTime,
+    /// Indicates the price of the Lower Auction Collar Threshold
+    /// (10% below the Near Execution Price).
+    pub lower_collar: Price<u32, 4>,
+    /// Indicates the price of the Upper Auction Collar Threshold
+    /// (10% above the Near Execution Price).
+    pub upper_collar: Price<u32, 4>,
 }
 
 impl DirectListingWithCapitalRaise {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
-        // TODO
+        let (input, stock) = StockSymbol::parse(input)?;
+        let (input, eligibility) = parse_bool(input)?;
+        let (input, min_price) = Price::<u32, 4>::parse(input)?;
+        let (input, max_price) = Price::<u32, 4>::parse(input)?;
+        let (input, near_exec_price) = Price::<u32, 4>::parse(input)?;
+        let (input, near_exec_time) = parse_nanosecs_bold(input)?;
+        let (input, lower_collar) = Price::<u32, 4>::parse(input)?;
+        let (input, upper_collar) = Price::<u32, 4>::parse(input)?;
 
-        Ok((input, Self {  }))
+        Ok((input, Self { 
+            stock,
+            eligibility,
+            min_price,
+            max_price,
+            near_exec_price,
+            near_exec_time,
+            lower_collar,
+            upper_collar,
+        }))
     }
 
 }

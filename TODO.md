@@ -4,31 +4,31 @@
 - [ ] Test documentation approach with `cargo doc`
 
 ### messages
-- [ ] Finish adding specialized fields & parse (see `nsdq-util`)
-- [ ] Opinionated grammar for type renaming, make note of original
+- [x] Finish adding specialized fields & parse (see `nsdq-util`)
+- [x] Opinionated grammar for type renaming, make note of original
+- [ ] Consolidate types where possible?
 `order.rs`
-- [ ] order executed
-- [ ] order replace
-- [ ] Consolidate add types using `Option<Mpid>`? `OrderAdded`?
+- [x] order executed
+- [x] order replace
 `stock.rs`
-- [ ] luld collar
-- [ ] market participant pos
-- [ ] mwcb decline
-- [ ] mwcb status
-- [ ] operational halt
-- [ ] quoting period
-- [ ] reg sho
-- [ ] directory
-- [ ] trading action
+- [x] luld collar
+- [x] market participant pos
+- [x] mwcb decline
+- [x] mwcb status
+- [x] operational halt
+- [x] quoting period
+- [x] reg sho
+- [ ] directory (`IssueSubType`)
+- [ ] trading action (`ActionReason`) (Generator function for strings)
 `system.rs`
-- [ ] direct_listing
-- [ ] net order imbal
-- [ ] system event merged with `EventCode` enum?
-- [ ] retail price improvement indicator
+- [x] direct_listing
+- [x] net order imbal
+- [x] system event merged with `EventCode` enum?
+- [x] retail price improvement indicator
 `trade.rs`
-- [ ] match
-- [ ] cross
-- [ ] broken
+- [x] match
+- [x] cross
+- [x] broken
 
 
 ## Future directions

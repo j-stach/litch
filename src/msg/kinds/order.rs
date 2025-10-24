@@ -1,73 +1,91 @@
 
-// TODO: May be able to combine these types
-
 use nom::number::streaming::{ be_u64, be_u32 };
-use nsdq_util::define_enum;
+use nsdq_util::{ 
+    define_enum, 
+    StockSymbol, 
+    Price,
+    Mpid,
+    parse_bool,
+};
 
-/// Generated for unattributed orders accepted by NASDAQ. 
+/// Generated for new orders accepted by NASDAQ. 
+/// Represents Type "A" messages (i.e., without explicit MPID attribution).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AddOrder {
+pub struct OrderAdded {
+
+    /// Day-unique identifier used to track the order.
     pub order_ref_num: u64,
+    /// Buy/Sell indicator.
     pub side: Side,
+    /// Number of shares for the order.
     pub quantity: u32,
-    // TODO pub stock: StockSymbol,
-    // pub price: Price32
+    /// Stock symbol for which the order was placed.
+    pub stock: StockSymbol,
+    /// Price for which the order was placed.
+    pub price: Price<u32, 4>,
 }
 
-impl AddOrder {
+impl OrderAdded {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
-        // TODO
         let (input, order_ref_num) = be_u64(input)?;
         let (input, side) = Side::parse(input)?;
         let (input, quantity) = be_u32(input)?;
-        // let (input, stock) = StockSymbol::parse(input)?;
-        // let (input, price) = be_u32(input)?;
+        let (input, stock) = StockSymbol::parse(input)?;
+        let (input, price) = Price::<u32, 4>::parse(input)?;
 
         Ok((input, Self { 
             order_ref_num,
             side,
             quantity,
-            // stock,
-            // price
+            stock,
+            price,
         }))
     }
-
 }
 
-/// Generated for attributed orders and quotations accepted by NASDAQ.
-/// (NOTE: If a firm wants to display a MPID for unattributed orders, 
-/// Nasdaq recommends that it use the MPID of “NSDQ”.)
+
+/// Generated for new orders accepted by NASDAQ. 
+/// Represents Type "F" messages (i.e., with explicit MPID attribution).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct AddOrderWithAttr {
+pub struct OrderAddedWithMpid {
+
+    /// Day-unique identifier used to track the order.
     pub order_ref_num: u64,
+    /// Buy/Sell indicator.
     pub side: Side,
+    /// Number of shares for the order.
     pub quantity: u32,
-    // TODO pub stock: StockSymbol,
-    // pub price: Price32,
-    // pub attribution: str4
+    /// Stock symbol for which the order was placed.
+    pub stock: StockSymbol,
+    /// Price for which the order was placed.
+    pub price: Price<u32, 4>,
+    /// Market Participant ID (MPID) attribution for the order.
+    /// NOTE: Used only for Type "F" OrderAdded messages (section 1.3.2).
+    /// NOTE: If a firm wants to display a MPID for unattributed orders, 
+    /// Nasdaq recommends that it use the MPID of “NSDQ”.
+    pub mpid: Mpid,
 }
 
-impl AddOrderWithAttr {
+impl OrderAddedWithMpid {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
-        // TODO
         let (input, order_ref_num) = be_u64(input)?;
         let (input, side) = Side::parse(input)?;
         let (input, quantity) = be_u32(input)?;
-        // let (input, stock) = StockSymbol::parse(input)?;
-        // let (input, price) = be_u32(input)?;
-        // let (input, attribution) = Attribution::parse(input)?;
+        let (input, stock) = StockSymbol::parse(input)?;
+        let (input, price) = Price::<u32, 4>::parse(input)?;
+        let (input, mpid) = Mpid::parse(input)?;
 
         Ok((input, Self { 
             order_ref_num,
             side,
             quantity,
-            // stock,
-            // price,
-            // attribution
+            stock,
+            price,
+            mpid
         }))
     }
 
@@ -84,7 +102,6 @@ define_enum!{
         "Sell",
 }
 
-// TODO: May be able to combine these types
 
 /// Sent whenever an order on the book is executed in whole or in part. 
 /// Messages are cumulative for orders executed in parts.
@@ -92,6 +109,7 @@ define_enum!{
 /// one can build a complete view of all executions on NASDAQ. 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OrderExecuted {
+
     /// Identifier of the order for which a trade was executed.
     pub order_ref_num: u64,
     /// Quantity of shares traded.
@@ -120,14 +138,19 @@ impl OrderExecuted {
 /// at a price different from the initial display price.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct OrderExecutedWithPrice {
+
     /// Identifier of the order for which a trade was executed.
     pub order_ref_num: u64,
     /// Quantity of shares traded.
     pub quantity: u32,
     /// Identifier for the trade event.
     pub match_number: u64,
-    // pub printable: bool,
-    // pub price: Price32
+    /// If true, execution will be reflected on time and sales displays 
+    /// and volume calculations.
+    pub printable: bool,
+    /// Price at which the trade executed.
+    /// Value will likely be different from what it was in `OrderAdded`.
+    pub price: Price<u32, 4>,
 }
 
 impl OrderExecutedWithPrice {
@@ -137,11 +160,15 @@ impl OrderExecutedWithPrice {
         let (input, order_ref_num) = be_u64(input)?;
         let (input, quantity) = be_u32(input)?;
         let (input, match_number) = be_u64(input)?;
+        let (input, printable) = parse_bool(input)?;
+        let (input, price) = Price::<u32, 4>::parse(input)?;
 
         Ok((input, Self {
             order_ref_num,
             quantity,
             match_number,
+            printable,
+            price,
         }))
     }
 }
@@ -149,14 +176,15 @@ impl OrderExecutedWithPrice {
 
 /// Sent whenever an order is modified as a result of a partial cancellation.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct OrderCancel {
+pub struct OrderCanceled {
+
     /// Identifier for the canceled order.
     pub order_ref_num: u64,
     /// Number of shares being removed from the order's display size.
     pub quantity: u32,
 }
 
-impl OrderCancel {
+impl OrderCanceled {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
@@ -173,12 +201,13 @@ impl OrderCancel {
 /// Sent whenever an order on the book is being cancelled. 
 /// Shares are no longer accessible and the order must be removed from the book.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct OrderDelete {
+pub struct OrderDeleted {
+
     /// Identifier for the deleted order.
     pub order_ref_num: u64,
 }
 
-impl OrderDelete {
+impl OrderDeleted {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
@@ -197,7 +226,7 @@ impl OrderDelete {
 /// Since the side, stock symbol and attribution cannot be changed by a Replace,
 /// firms should retain these values from the original order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct OrderReplace {
+pub struct OrderReplaced {
 
     /// Identifier for the canceled order.
     pub old_ref_num: u64,
@@ -205,21 +234,24 @@ pub struct OrderReplace {
     pub new_ref_num: u64,
     /// New quantity of shares.
     pub quantity: u32,
-    // pub price: Price32
+    /// Replacement price.
+    pub price: Price<u32, 4>,
 }
 
-impl OrderReplace {
+impl OrderReplaced {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
         let (input, old_ref_num) = be_u64(input)?;
         let (input, new_ref_num) = be_u64(input)?;
         let (input, quantity) = be_u32(input)?;
+        let (input, price) = Price::<u32, 4>::parse(input)?;
 
         Ok((input, Self {
             old_ref_num,
             new_ref_num,
-            quantity
+            quantity,
+            price,
         }))
     }
 
