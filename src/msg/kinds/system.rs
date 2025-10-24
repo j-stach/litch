@@ -9,39 +9,23 @@ use nsdq_util::{
     parse_bool,
 };
 
-/// Signals a market or data feed handler event.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SystemEvent {
-    // TBD: Can be collapsed into one type?
-    pub event_code: EventCode 
-}
-
-impl SystemEvent {
-
-    pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
-
-        let (input, event_code) = EventCode::parse(input)?;
-        Ok((input, Self { event_code }))
-    }
-
-}
-
+// NOTE: SystemEvent is a message type that conveys a single tag.
 define_enum!{
 
-    EventCode:
+    SystemEvent:
         "System events that can occur on the TotalView-ITCH data feed.";
 
     ['O'] BeginMessages 
-        "Start of Messages. 
-        This is the first message sent in any trading day.
+        "Start of Messages. \n \
+        This is the first message sent in any trading day. \
         (With the exception of Timestamp messages.)",
 
     ['S'] BeginSystemHours 
-        "Start of System hours. 
+        "Start of System hours. \n \
         NASDAQ is open and ready to start accepting orders.",
 
     ['Q'] BeginMarketHours
-        "Start of Market hours. 
+        "Start of Market hours. \n \
         Market Hours orders are available for execution.",
 
     ['M'] EndMarketHours 
@@ -49,13 +33,13 @@ define_enum!{
         Market Hours orders are no longer available for execution.",
 
     ['E'] EndSystemHours
-        "End of System hours. 
+        "End of System hours. \n \
         NASDAQ has closed and will not accept any new orders.
         NOTE: It is still possible to receive BrokenTrade and OrderDelete 
         messages after the End of Day.",
 
     ['C'] EndMessages 
-        "End of Messages. 
+        "End of Messages. \n \
         This is always the last message sent in any trading day.",
 }
 
@@ -162,7 +146,7 @@ define_enum!{
 define_enum!{
 
     PriceVariation:
-        "Absolute value of the percentage of deviation of the 
+        "Absolute value of the percentage of deviation of the \
         Near Indicative Clearing Price to the nearest Current Reference Price.";
 
     ['L'] Zero

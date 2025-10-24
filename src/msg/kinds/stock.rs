@@ -34,7 +34,8 @@ pub struct StockDirectory {
     /// Identifies the security class for the issue.
     pub class: IssueClassification,
 
-    // TODO pub subtype: IssueSubType, // 2byte alpha
+    /// Security sub-type for the issue.
+    pub subtype: IssueSubType,
 
     /// Denotes if an issue or quoting participant record is set-up in a 
     /// live/production, test, or demo state.
@@ -88,6 +89,7 @@ impl StockDirectory {
         let (input, round_lot_size) = be_u32(input)?;
         let (input, round_lots_only) = parse_bool(input)?;
         let (input, class) = IssueClassification::parse(input)?;
+        let (input, subtype) = IssueSubType::parse(input)?;
         let (input, authenticity) = Authenticity::parse(input)?;
         let (input, short_sale_threshold) = parse_ternary(input)?;
         let (input, ipo_flag) = parse_ternary(input)?;
@@ -96,8 +98,6 @@ impl StockDirectory {
         let (input, etp_leverage_factor) = be_u32(input)?;
         let (input, inverse) = parse_bool(input)?;
 
-        // TODO Other fields
-
         Ok((input, Self { 
             stock,
             market_category,
@@ -105,6 +105,7 @@ impl StockDirectory {
             round_lot_size,
             round_lots_only,
             class,
+            subtype,
             authenticity,
             short_sale_threshold,
             ipo_flag,
@@ -212,10 +213,74 @@ define_enum! {
 
 define_enum!{
 
+    IssueSubType [2usize] "Security sub-type for the issue.";
+
+    [b"A "] PreferredTrustSecurities "",
+    [b"AI"] AlphaIndexEtns "",
+    [b"B "] IndexBasedDerivative "",
+    [b"C "] CommonShares "",
+    [b"CB"] CommodityBasedTrustShares "",
+    [b"CF"] CommodityFuturesTrustShares "",
+    [b"CL"] CommodityLinkedSecurities "",
+    [b"CM"] CommodityIndexTrustShares "",
+    [b"CO"] CollateralizedMortgageObligation "",
+    [b"CT"] CurrencyTrustShares "",
+    [b"CU"] CommodityCurrencyLinkedSecurities "",
+    [b"CW"] CurrencyWarrants "",
+    [b"D "] GlobalDepositaryShares "",
+    [b"E "] EtfPortfolioDepositaryReceipt "",
+    [b"EG"] EquityGoldShares "",
+    [b"EI"] EtnEquityIndexLinkedSecurities "",
+    [b"EM"] NextSharesExchangeTradedManagedFund "",
+    [b"EN"] ExchangeTradedNotes "",
+    [b"EU"] EquityUnits "",
+    [b"F "] Holdrs "",
+    [b"FI"] EtnFixedIncomeLinkedSecurities "",
+    [b"FL"] EtnFuturesLinkedSecurities "",
+    [b"G "] GlobalShares "",
+    [b"I "] EtfIndexFundShares "",
+    [b"IR"] InterestRate "",
+    [b"IW"] IndexWarrant "",
+    [b"IX"] IndexLinkedExchangeableNotes "",
+    [b"J "] CorporateBackedTrustSecurity "",
+    [b"L "] ContingentLitigationRight "",
+    [b"LL"] LimitedLiabilityCompany  "",
+    [b"M "] EquityBasedDerivative "",
+    [b"MF"] ManagedFundShares "",
+    [b"ML"] EtnMultiFactorIndexLinkedSecurities "",
+    [b"MT"] ManagedTrustSecurities "",
+    [b"N "] NyRegistryShares "",
+    [b"O "] OpenEndedMutualFund "",
+    [b"P "] PrivatelyHeldSecurity "",
+    [b"PP"] PoisonPill "",
+    [b"PU"] PartnershipUnits "",
+    [b"Q "] ClosedEndFunds "",
+    [b"R "] RegS "",
+    [b"RC"] CommodityRedeemableCommodityLinkedSecurities "",
+    [b"RF"] EtnRedeemableFuturesLinkedSecurities "",
+    [b"RT"] Reit "",
+    [b"RU"] CommodityRedeemableCurrencyLinkedSecurities "",
+    [b"S "] Seed "",
+    [b"SC"] SpotRateClosing "",
+    [b"SI"] SpotRateIntraday "",
+    [b"T "] TrackingStock "",
+    [b"TC"] TrustCertificates "",
+    [b"TU"] TrustUnits "",
+    [b"U "] Portal "",
+    [b"V "] ContingentValueRight "",
+    [b"W "] TrustIssuedReceipts "",
+    [b"WC"] WorldCurrencyOption "",
+    [b"X "] Trust "",
+    [b"Y "] Other "",
+    [b"Z "] NotApplicable "",
+}
+
+define_enum!{
+
     Authenticity:
-        "Denotes if an issue or quoting participant record is set-up in
-        Nasdaq systems in a live/production, test, or demo state.
-        NOTE: Firms should only show live issues and quoting
+        "Denotes if an issue or quoting participant record is set-up in \
+        Nasdaq systems in a live/production, test, or demo state. \
+        NOTE: Firms should only show live issues and quoting \
         participants on public quotation displays.";
 
     ['P'] Production
@@ -227,8 +292,8 @@ define_enum!{
 define_enum!{
 
     LuldTier:
-        "Indicates which Limit Up / Limit Down price band calculation
-        parameter is to be used for the instrument. 
+        "Indicates which Limit Up / Limit Down price band calculation \
+        parameter is to be used for the instrument. \
         Refer to LULD Rule for details.";
 
     ['1'] Tier1
@@ -258,9 +323,9 @@ pub struct TradingAction {
     /// Current trading state of the stock.
     pub state: TradingState,
     /// Reserved. 
-    // TBD: Unclear in the spec exactly what this does or how it is used.
-    pub reserved: char,
-    //TODO reason: TradingActionReason (string4)
+    pub reserved: char, // TBD: Unclear purpose
+    /// Reason for the change in trading status.
+    pub reason: TradingActionReason,
 }
 
 impl TradingAction {
@@ -270,11 +335,13 @@ impl TradingAction {
         let (input, stock) = StockSymbol::parse(input)?;
         let (input, state) = TradingState::parse(input)?;
         let (input, rsvd) = nom::bytes::complete::take(1usize)(input)?;
+        let (input, reason) = TradingActionReason::parse(input)?;
 
         Ok((input, Self { 
             stock, 
             state, 
             reserved: rsvd[0] as char,
+            reason,
         }))
     }
 
@@ -288,12 +355,56 @@ define_enum!{
     ['H'] Halted 
         "Halted across all U.S. equity markets / SROs.",
     ['P'] Paused
-        "Paused across all U.S. equity markets / SROs 
+        "Paused across all U.S. equity markets / SROs \
         (Nasdaq---listed securities only).",
     ['Q'] QuoteOnly
         "Quotation only period for cross-SRO halt or pause.",
     ['T'] Trading
         "Trading on NASDAQ.",
+}
+
+define_enum!{
+
+    TradingActionReason [4usize] 
+        "Nasdaq will send out a trading action message to inform its market \
+        participants when the trading status of an issue changes. \
+        For informational purposes, Nasdaq also attempts to provide the reason \
+        for each trading action update.";
+
+    [b"T1  "] HaltNewsPending "",
+    [b"T2  "] HaltNewsDisseminated "",
+    [b"T5  "] SingleSecurityTradingPause "",
+    [b"T6  "] ExtraordinaryMarketActivity "",
+    [b"T8  "] HaltEtf "",
+    [b"T12 "] TradingHalted "For Information Requested by Listing Market",
+    [b"H4  "] HaltNonCompliance "",
+    [b"H9  "] HaltFilingsNotCurrent "",
+    [b"H10 "] HaltSecTradingSuspension "",
+    [b"H11 "] HaltRegulatoryConcern "",
+    [b"O1  "] OperationsHalt "Contact Market Operations",
+    [b"LUDP"] VolatilityPause "",
+    [b"LUDS"] VolatilityPauseStraddleCondition "",
+    [b"MWC1"] MwcbHalt1 "",
+    [b"MWC2"] MwcbHalt2 "",
+    [b"MWC3"] MwcbHalt3 "",
+    [b"MWC0"] MwcbHaltRemainInEffect "",
+    [b"IPO1"] IpoIssue "Not Yet Trading",
+    [b"M1  "] CorporateAction "",
+    [b"M2  "] QuotationNotAvailable "",
+    [b"    "] ReasonNotAvailable "",
+    [b"T3  "] NewsAndResumptionTimes "",
+    [b"T7  "] SingleSecurityQuotationPause "Quotation Only Period",
+    [b"R4  "] QualificationsResolved "Trading to resume",
+    [b"R9  "] FilingResolved "Trading to resume",
+    [b"C3  "] IssuerNewsNotForthcoming "Trading to resume",
+    [b"C4  "] MaintenanceRequirementsMet "Qualifications Halt ended",
+    [b"C9  "] FilingsMet "Qualifications Halt Concluded",
+    [b"C11 "] TradeHaltConcludedByRegulator "Trades Resume",
+    [b"MWCQ"] MwcbResumption "",
+    [b"R1  "] NewIssueAvailable "",
+    [b"R2  "] IssueAvailable "",
+    [b"IPOQ"] IpoSecurityReleased "(Nasdaq Securities Only)",
+    [b"IPOE"] IpoPositioningWindowExtension "(Nasdaq Only)",
 }
 
 
@@ -373,8 +484,8 @@ impl MarketParticipantPosition {
 define_enum!{
 
     MarketMakerMode:
-        "Quoting participant’s registration status in relation to SEC Rules 101 
-        and 104 of Regulation M.";
+        "Quoting participant’s registration status in relation to \
+        SEC Rules 101 and 104 of Regulation M.";
 
     ['N'] Normal
         "Normal",
@@ -406,7 +517,7 @@ define_enum!{
 }
 
 
-/// Market-wide Circuit Breaker (MWCB) breach points for the current trading day.
+/// Market-wide Circuit Breaker (MWCB) levels for the current trading day.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MwcbDeclineLevel {
 
