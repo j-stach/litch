@@ -5,6 +5,7 @@ authors = ["j-stach"]
 version = "0.0.0"
 edition = "2024"
 readme = "README.md"
+license = "MIT"
 repository = "https://github.com/j-stach/litch"
 description = "Simple parser for ITCH 5.0, oriented toward live messages."
 keywords = ["itch", "nasdaq", "trading", "finance"]
