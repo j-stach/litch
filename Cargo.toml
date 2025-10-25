@@ -11,8 +11,8 @@ keywords = ["itch", "nasdaq", "trading", "finance"]
 categories = ["network-programming", "finance"]
 
 [dependencies]
-nsdq-util = { path = "../nsdq-util" }
 nom = "8.0.0"
+nsdq-util = "0.1.0"
 thiserror = "2.0.12"
 
 

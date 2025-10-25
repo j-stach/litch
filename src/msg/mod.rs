@@ -6,7 +6,6 @@ pub use metadata::ItchMetadata;
 pub use kinds::*;
 
 
-//
 macro_rules! parse_kind {
     ($input:expr, $meta:expr, $kind:ident) => {{
         let (input, body) = $kind::parse($input)?;
@@ -14,15 +13,16 @@ macro_rules! parse_kind {
     }}
 }
 
-//
 macro_rules! msg_kinds {
-    ($([$tag:expr] $kind:ident $doc:expr),* $(,)?) => {
+    ($([$tag:expr] $kind:ident $($doc:expr)?),* $(,)?) => {
 
         /// Represents all messages that can originate from an ITCH broadcast.
         /// "Message Type" tag is implicit through this enum.
+        ///
+        /// Docs for each kind of message can be found on the subtype in `kinds`
         #[derive(Debug, Clone, Copy, PartialEq, Eq)]
         pub enum ItchMessage {$(
-            #[doc = $doc]
+            $(#[doc = $doc])?
             $kind { metadata: ItchMetadata, body: crate::msg::kinds::$kind },
         )*}
 
@@ -51,10 +51,6 @@ macro_rules! msg_kinds {
             }
         }
 
-        // TODO make `body` more easily accessible somehow
-        // implement Deref and DerefMut for ItchMessage?
-        // Use dyn Message trait?
-        // Use Option methods for fields?
     }
 }
 
@@ -65,62 +61,41 @@ msg_kinds!{
         "Market or data feed handler event.",
 
     // 1.2
-    [b'R'] StockDirectory
-        "",
-    [b'H'] TradingAction 
-        "",            
+    [b'R'] StockDirectory,
+    [b'H'] TradingAction, 
     [b'Y'] RegShoRestriction 
         "Regulation SHO Short-Sale-Price-Test-Restricted Indicator.",       
-    [b'L'] MarketParticipantPosition
-        "",
-    [b'V'] MwcbDeclineLevel
-        "",
-    [b'W'] MwcbStatus                  
-        "",
-    [b'K'] QuotingPeriodUpdate         
-        "",
-    [b'J'] LuldAuctionCollar            
-        "",
-    [b'h'] OperationalHalt             
-        "",
+    [b'L'] MarketParticipantPosition,
+    [b'V'] MwcbDeclineLevel,
+    [b'W'] MwcbStatus,                  
+    [b'K'] QuotingPeriodUpdate,         
+    [b'J'] LuldAuctionCollar,            
+    [b'h'] OperationalHalt,             
 
     // 1.3
-    [b'A'] OrderAdded                    
-        "",
-    [b'F'] OrderAddedWithMpid            
-        "",
+    [b'A'] OrderAdded,                    
+    [b'F'] OrderAddedWithMpid,            
 
     // 1.4
-    [b'E'] OrderExecuted            
-        "",
-    [b'C'] OrderExecutedWithPrice      
-        "",
-    [b'X'] OrderCanceled
-        "",
-    [b'D'] OrderDeleted
-        "",
-    [b'U'] OrderReplaced
-        "",
+    [b'E'] OrderExecuted,            
+    [b'C'] OrderExecutedWithPrice,      
+    [b'X'] OrderCanceled,
+    [b'D'] OrderDeleted,
+    [b'U'] OrderReplaced,
     
     // 1.5
-    [b'P'] MatchTrade
-        "",
-    [b'Q'] CrossTrade
-        "",
-    [b'B'] BrokenTrade
-        "",
+    [b'P'] MatchTrade,
+    [b'Q'] CrossTrade,
+    [b'B'] BrokenTrade,
     
     // 1.6
-    [b'I'] NetOrderImbalance
-        "",
+    [b'I'] NetOrderImbalance,
     
     // 1.7
-    [b'N'] RetailPriceImprovement
-        "",
+    [b'N'] RetailPriceImprovement,
     
     // 1.8
-    [b'O'] DirectListingWithCapitalRaise
-        "",
+    [b'O'] DirectListingWithCapitalRaise,
 }
 
 
