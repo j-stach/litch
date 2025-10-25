@@ -14,7 +14,7 @@ If you are willing and able to assist with integration testing, please leave a r
 cargo add litch
 ```
 2. Create a UDP socket and connect to the TotalView-ITCH broadcast port. <br>
-When you receive data, parse it as an `ItchMessage` enum.
+When you receive data, parse it into an `ItchMessage` enum.
 ```rust
 use std::net::UdpSocket;
 use litch::ItchMessage;
@@ -29,7 +29,7 @@ let msg = ItchMessage::parse(buf[..len]).unwrap();
 ```
 3. Use `match` to extract message contents. 
 All messages have `metadata` and a `body` which contains variant-specific data.
-```
+```rust
 use litch::msg::SystemEvent::*;
 use ItchMessage::*;
 
@@ -44,7 +44,7 @@ match msg {
 }
 ```
 4. The message metadata (`ItchMetadata`) can be accessed without matching. 
-```
+```rust
 let meta = msg.metadata();
 let _time = meta.timestamp;
 let _locate = meta.stock_locate;
