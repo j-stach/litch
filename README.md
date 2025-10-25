@@ -46,9 +46,9 @@ match msg {
 4. The message metadata (`ItchMetadata`) can be accessed without matching. 
 ```rust
 let meta = msg.metadata();
-let _time = meta.timestamp;
-let _locate = meta.stock_locate;
-let _num = meta.tracking_number;
+let _time: NaiveTime = meta.timestamp;
+let _locate: u16  = meta.stock_locate;
+let _num: u16 = meta.tracking_number;
 ```
 
 

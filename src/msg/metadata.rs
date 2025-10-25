@@ -16,14 +16,14 @@ pub struct ItchMetadata {
 }
 
 use nom::number::streaming::be_u16;
-use nsdq_util::parse_nanosecs_bold;
+use nsdq_util::parse_itch_time_bold;
 
 impl ItchMetadata {
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
         let (input, stock_locate) = be_u16(input)?;
         let (input, tracking_number) = be_u16(input)?;
-        let (input, timestamp) = parse_nanosecs_bold(input)?;
+        let (input, timestamp) = parse_itch_time_bold(input)?;
 
         Ok((input, Self { 
             stock_locate, 

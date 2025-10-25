@@ -10,9 +10,11 @@ description = "Simple parser for ITCH 5.0, oriented toward live messages."
 keywords = ["itch", "nasdaq", "trading", "finance"]
 categories = ["network-programming", "finance"]
 
+exclude = [".git/**", "src/test/**", "TODO.md"]
+
 [dependencies]
 nom = "8.0.0"
-nsdq-util = "0.1.0"
+nsdq-util = "0.1.1"
 thiserror = "2.0.12"
 
 

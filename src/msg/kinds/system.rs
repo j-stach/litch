@@ -5,7 +5,7 @@ use nsdq_util::{
     StockSymbol, 
     Price,
     NaiveTime,
-    parse_nanosecs_bold,
+    parse_itch_time_bold,
     parse_bool,
 };
 
@@ -115,32 +115,22 @@ define_enum!{
     ImbalanceDirection:
         "The market side of the order imbalance.";
 
-    ['B'] Buy
-        "",
-    ['S'] Sell
-        "",
-    ['N'] NoImbalance
-        "",
-    ['O'] Uncalculated
-        "",
-    ['P'] Paused
-        "",
+    ['B'] Buy,
+    ['S'] Sell,
+    ['N'] NoImbalance,
+    ['O'] Uncalculated,
+    ['P'] Paused,
 }
 
 // TODO: Consolidate cross types?
 define_enum!{
 
-    ImbalanceCrossType:
-        "";
+    ImbalanceCrossType: "";
 
-    ['O'] Opening
-        "",
-    ['C'] Closing
-        "",
-    ['H'] Halt
-        "",
-    ['A'] ExtendedClose
-        "",
+    ['O'] Opening,
+    ['C'] Closing,
+    ['H'] Halt,
+    ['A'] ExtendedClose,
 }
 
 define_enum!{
@@ -254,7 +244,7 @@ impl DirectListingWithCapitalRaise {
         let (input, min_price) = Price::<u32, 4>::parse(input)?;
         let (input, max_price) = Price::<u32, 4>::parse(input)?;
         let (input, near_exec_price) = Price::<u32, 4>::parse(input)?;
-        let (input, near_exec_time) = parse_nanosecs_bold(input)?;
+        let (input, near_exec_time) = parse_itch_time_bold(input)?;
         let (input, lower_collar) = Price::<u32, 4>::parse(input)?;
         let (input, upper_collar) = Price::<u32, 4>::parse(input)?;
 

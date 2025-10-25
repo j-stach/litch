@@ -6,7 +6,7 @@ use nsdq_util::{
     parse_ternary,
     StockSymbol,
     NaiveTime,
-    parse_nanosecs_bold,
+    parse_itch_time_bold,
     Price,
     Mpid,
 };
@@ -587,7 +587,7 @@ impl QuotingPeriodUpdate {
 
     pub(crate) fn parse(input: &[u8]) -> nom::IResult<&[u8], Self> {
 
-        let (input, release_time) = parse_nanosecs_bold(input)?;
+        let (input, release_time) = parse_itch_time_bold(input)?;
         let (input, qualifier) = IpoQuotationReleaseQualifier::parse(input)?;
         let (input, ipo_price) = Price::<u32, 4>::parse(input)?;
 
